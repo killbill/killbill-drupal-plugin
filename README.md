@@ -7,7 +7,7 @@ Getting started
 ---------------
 
 Please refer to the [Drupal documentation](http://drupal.org/start) for the Drupal specific steps.
-The ones below should work for a standard Apache/MySQL insteallation on Mac OS X or Linux.
+The ones below should work for a standard Apache/MySQL installation on Mac OS X or Linux.
 
 1. Create a MySQL account and database
     1. `create database drupal;`
@@ -30,14 +30,14 @@ The ones below should work for a standard Apache/MySQL insteallation on Mac OS X
         2. `chmod o+w sites/default/files/`
     4. Create the configuration file
         1. `cp ./sites/default/default.settings.php ./sites/default/settings.php`
-        2. Configure the MySQL driver by adding right after `databases = array();`:
+        2. Configure the MySQL driver by adding right after `databases = array();`
 <pre>$databases['default']['default'] = array(
-  'driver' => 'mysql',
-  'database' => 'drupal',
-  'username' => 'drupal',
-  'password' => 'drupal',
-  'host' => 'localhost',
-  'prefix' => '',
+        'driver' => 'mysql',
+        'database' => 'drupal',
+        'username' => 'drupal',
+        'password' => 'drupal',
+        'host' => 'localhost',
+        'prefix' => '',
 );
 </pre>
     5. Go to http://127.0.0.1 and follow the instructions
@@ -51,7 +51,7 @@ The ones below should work for a standard Apache/MySQL insteallation on Mac OS X
     3. Enable it by going to http://127.0.0.1/admin/modules
 6. Configure the Killbill module
     1. Configure the permissions by going to http://127.0.0.1/admin/people/permissions#module-killbill
-    2. Configure your Killbill installation by going to http://127.0.0.1:90/admin/config/services/killbill
+    2. Configure your Killbill installation by going to http://127.0.0.1/admin/config/services/killbill
 7. Verify your installation
     1. Create a new user in your Drupal installation by going to http://127.0.0.1/user/register (logout as admin first)
     2. Log back in as admin and find your newly created user by going to http://127.0.0.1/admin/people
