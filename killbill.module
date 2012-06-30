@@ -1,5 +1,7 @@
 <?php
 
+include_once dirname(__FILE__) . '/includes/killbill.account.inc';
+
 function killbill_menu() {
     $items = array();
 
@@ -58,6 +60,88 @@ function killbill_permission() {
 }
 
 function killbill_help($path, $arg) {
+}
+
+function killbill_user_view($account, $view_mode, $langcode) {
+    if (!$account->uid || !user_access('administer killbill')) {
+        return;
+    }
+
+    if (!killbill_client_initialize()) {
+        return;
+    }
+
+    if (!($killbill_account = killbill_retrieve_account($account))) {
+        return;
+    }
+
+    $account->content['killbill_account'] = array(
+        '#type' => 'user_profile_category',
+        '#title' => t('Killbill information'),
+        '#weight' => 0,
+    );
+
+    if (empty($killbill_account->company)) {
+        $account_holder = t('@name', array('@name' => $killbill_account->name));
+    }
+    else {
+        $account_holder = t('@name, @company', array('@name' => $killbill_account->name, '@company' => $killbill_account->company));
+    }
+
+    $account->content['killbill_account']['account_holder'] = array(
+        '#type' => 'user_profile_item',
+        '#title' => t('Account holder'),
+        '#markup' => $account_holder,
+    );
+
+    $account->content['killbill_account']['account_email'] = array(
+        '#type' => 'user_profile_item',
+        '#title' => t('Account e-mail address'),
+        '#markup' => check_plain($killbill_account->email),
+    );
+
+    $account->content['killbill_account']['account_currency'] = array(
+        '#type' => 'user_profile_item',
+        '#title' => t('Account currency'),
+        '#markup' => check_plain($killbill_account->currency),
+    );
+
+    $account->content['killbill_account']['account_timeZone'] = array(
+        '#type' => 'user_profile_item',
+        '#title' => t('Account time zone'),
+        '#markup' => check_plain($killbill_account->timeZone),
+    );
+
+    $account->content['killbill_account']['account_kbid'] = array(
+        '#type' => 'user_profile_item',
+        '#title' => t('Killbill account id'),
+        '#markup' => check_plain($killbill_account->accountId),
+    );
+}
+
+function killbill_user_insert(&$edit, $account, $category) {
+    if (!killbill_client_initialize()) {
+        return;
+    }
+
+    $accountData = new Killbill_Account();
+    $accountData->externalKey = $account->uid;
+    $accountData->name = $account->name;
+    $accountData->email = $account->mail;
+    $accountData->currency = 'USD';
+    $accountData->paymentMethodId = null;
+    $accountData->address1 = null;
+    $accountData->address2 = null;
+    $accountData->company = null;
+    $accountData->state = null;
+    $accountData->country = null;
+    $accountData->phone = null;
+    $accountData->length = strlen($accountData->name);
+    $accountData->billCycleDay = 0;
+    $accountData->timeZone = $account->timezone;
+
+    global $base_root;
+    $accountData->create($base_root, "DRUPAL", "DRUPAL_HOOK_USER_INSERT::" . ip_address());
 }
 
 /**
