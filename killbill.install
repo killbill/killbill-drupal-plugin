@@ -1,0 +1,422 @@
+<?php
+
+function killbill_schema() {
+    // Notes:
+    // * We don't keep locally historical information.
+    // * The fields length could be optimized here but we decided to make them bigger in Drupal
+    //   to accomodate potential future changes in the Killbill data model.
+    $schema = array();
+
+    // Local copy of the Killbill account object, created/updated on push notifications.
+    $schema['killbill_accounts'] = array(
+        'description' => 'Killbill account information mapped to Drupal users.',
+        'fields' => array(
+            'kbid' => array(
+                'description' => 'The unique identifier of the account in Killbill.',
+                'type' => 'varchar',
+                'length' => 255,
+                'not null' => TRUE,
+                'default' => '',
+            ),
+            'email' => array(
+                'description' => 'The e-mail address associated with the account in Killbill.',
+                'type' => 'varchar',
+                'length' => 255,
+                'not null' => TRUE,
+                'default' => '',
+            ),
+            'name' => array(
+                'description' => 'The name of the account holder in Killbill.',
+                'type' => 'varchar',
+                'length' => 255,
+                'not null' => TRUE,
+                'default' => '',
+            ),
+            'first_name_length' => array(
+                'description' => 'The first name length of the account holder in Killbill.',
+                'type' => 'int',
+                'not null' => TRUE,
+                'default' => 0,
+            ),
+            'currency' => array(
+                'description' => 'The account currency in Killbill.',
+                'type' => 'varchar',
+                'length' => 255,
+                'not null' => TRUE,
+                'default' => 'USD',
+            ),
+            'billing_cycle_day' => array(
+                'description' => 'The bill cycle day of the account in Killbill.',
+                'type' => 'int',
+                'not null' => TRUE,
+                'default' => 0,
+            ),
+            'time_zone' => array(
+                'description' => 'The account time zone in Killbill.',
+                'type' => 'varchar',
+                'length' => 255,
+            ),
+            'locale' => array(
+                'description' => 'The account locale in Killbill.',
+                'type' => 'varchar',
+                'length' => 255,
+            ),
+            'address1' => array(
+                'description' => 'The first part of the account holder address in Killbill.',
+                'type' => 'varchar',
+                'length' => 255,
+            ),
+            'address2' => array(
+                'description' => 'The second part of the account holder address in Killbill.',
+                'type' => 'varchar',
+                'length' => 255,
+            ),
+            'company_name' => array(
+                'description' => 'The company associated with the account in Killbill.',
+                'type' => 'varchar',
+                'length' => 255,
+            ),
+            'city' => array(
+                'description' => 'The account holder city in Killbill.',
+                'type' => 'varchar',
+                'length' => 255,
+            ),
+            'state_or_province' => array(
+                'description' => 'The account holder city or province in Killbill.',
+                'type' => 'varchar',
+                'length' => 255,
+            ),
+            'country' => array(
+                'description' => 'The account holder country in Killbill.',
+                'type' => 'varchar',
+                'length' => 255,
+            ),
+            'postal_code' => array(
+                'description' => 'The account holder postal code in Killbill.',
+                'type' => 'varchar',
+                'length' => 255,
+            ),
+            'phone' => array(
+                'description' => 'The account holder phone in Killbill.',
+                'type' => 'varchar',
+                'length' => 255,
+            ),
+            'status' => array(
+                'description' => 'Whether the account is closed or active.',
+                'type' => 'varchar',
+                'length' => 255,
+                'not null' => TRUE,
+                'default' => 'ACTIVE',
+            ),
+            'uid' => array(
+                'description' => 'The {users}.uid that maps to this account.',
+                'type' => 'int',
+                'not null' => TRUE,
+                'default' => 0,
+            ),
+            'created_date' => array(
+                'description' => 'The Unix timestamp when the account information was created.',
+                'type' => 'int',
+                'not null' => TRUE,
+                'default' => 0,
+            ),
+            'updated_date' => array(
+                'description' => 'The Unix timestamp when the account information was last updated.',
+                'type' => 'int',
+                'not null' => TRUE,
+                'default' => 0,
+            ),
+            'data' => array(
+                'type' => 'blob',
+                'not null' => FALSE,
+                'size' => 'big',
+                'serialize' => TRUE,
+                'description' => 'A serialized array of additional data.',
+            ),
+        ),
+        'primary key' => array('kbid'),
+        'indexes' => array(
+            'uid' => array('uid'),
+        ),
+        'foreign keys' => array(
+            'user' => array(
+                'table' => 'users',
+                'columns' => array('uid' => 'uid'),
+            ),
+        ),
+    );
+
+    // Local copy of the Killbill bundle object, created/updated on push notifications.
+    $schema['killbill_bundles'] = array(
+        'description' => 'Killbill bundle information mapped to Drupal users.',
+        'fields' => array(
+            'kbid' => array(
+                'description' => 'The unique identifier of the bundle in Killbill.',
+                'type' => 'varchar',
+                'length' => 255,
+                'not null' => TRUE,
+                'default' => '',
+            ),
+            'external_key' => array(
+                'description' => 'The external key of the bundle in Killbill.',
+                'type' => 'varchar',
+                'length' => 255,
+                'not null' => TRUE,
+                'default' => '',
+            ),
+            'account_id' => array(
+                'description' => 'The account id associated with the bundle in Killbill.',
+                'type' => 'varchar',
+                'length' => 255,
+                'not null' => TRUE,
+                'default' => '',
+            ),
+            'last_sys_update_date' => array(
+                'description' => 'The Unix timestamp when the bundle was last modified in Killbill.',
+                'type' => 'int',
+                'not null' => TRUE,
+                'default' => 0,
+            ),
+            'created_date' => array(
+                'description' => 'The Unix timestamp when the account information was created.',
+                'type' => 'int',
+                'not null' => TRUE,
+                'default' => 0,
+            ),
+            'updated_date' => array(
+                'description' => 'The Unix timestamp when the account information was last updated.',
+                'type' => 'int',
+                'not null' => TRUE,
+                'default' => 0,
+            ),
+            'data' => array(
+                'type' => 'blob',
+                'not null' => FALSE,
+                'size' => 'big',
+                'serialize' => TRUE,
+                'description' => 'A serialized array of additional data.',
+            ),
+        ),
+        'primary key' => array('kbid'),
+        'indexes' => array(
+            'account_id' => array('account_id'),
+        ),
+        'foreign keys' => array(
+            'account' => array(
+                'table' => 'killbill_accounts',
+                'columns' => array('account_id' => 'kbid'),
+            ),
+        ),
+    );
+
+    // Local copy of the Killbill subscription object, created/updated on push notifications.
+    $schema['killbill_subscriptions'] = array(
+        'description' => 'Killbill subscription information mapped to Drupal users.',
+        'fields' => array(
+            'kbid' => array(
+                'description' => 'The unique identifier of the subscription in Killbill.',
+                'type' => 'varchar',
+                'length' => 255,
+                'not null' => TRUE,
+                'default' => '',
+            ),
+            'bundle_id' => array(
+                'description' => 'The unique identifier of the bundle associated with this subscription in Killbill.',
+                'type' => 'varchar',
+                'length' => 255,
+                'not null' => TRUE,
+                'default' => '',
+            ),
+            'category' => array(
+                'description' => 'The subscription category in Killbill.',
+                'type' => 'varchar',
+                'length' => 255,
+                'not null' => TRUE,
+                'default' => '',
+            ),
+            'start_date' => array(
+                'description' => 'The Unix timestamp when the subscription started in Killbill.',
+                'type' => 'int',
+                'not null' => TRUE,
+                'default' => 0,
+            ),
+            'bundle_start_date' => array(
+                'description' => 'The Unix timestamp when the bundle started in Killbill.',
+                'type' => 'int',
+                'not null' => TRUE,
+                'default' => 0,
+            ),
+            'active_version' => array(
+                'description' => 'The subscription version in Killbill.',
+                'type' => 'int',
+                'not null' => TRUE,
+                'default' => 1,
+            ),
+            'charged_through_date' => array(
+                'description' => 'The Unix timestamp until which the subscription has been charged in Killbill.',
+                'type' => 'int',
+                'not null' => TRUE,
+                'default' => 0,
+            ),
+            'paid_through_date' => array(
+                'description' => 'The Unix timestamp until which the subscription has been paid in Killbill.',
+                'type' => 'int',
+                'not null' => TRUE,
+                'default' => 0,
+            ),
+            'created_date' => array(
+                'description' => 'The Unix timestamp when the subscription information was created.',
+                'type' => 'int',
+                'not null' => TRUE,
+                'default' => 0,
+            ),
+            'updated_date' => array(
+                'description' => 'The Unix timestamp when the subscription information was last updated.',
+                'type' => 'int',
+                'not null' => TRUE,
+                'default' => 0,
+            ),
+            'data' => array(
+                'type' => 'blob',
+                'not null' => FALSE,
+                'size' => 'big',
+                'serialize' => TRUE,
+                'description' => 'A serialized array of additional data.',
+            ),
+        ),
+        'primary key' => array('kbid'),
+        'foreign keys' => array(
+            'bundle' => array(
+                'table' => 'killbill_bundles',
+                'columns' => array('bundle_id' => 'kbid'),
+            ),
+        ),
+    );
+
+    // Local copy of the Killbill subscription_event object, created/updated on push notifications.
+    $schema['killbill_subscription_events'] = array(
+        'description' => 'Killbill subscription event information mapped to Drupal users.',
+        'fields' => array(
+            'kbid' => array(
+                'description' => 'The unique identifier of the subscription event in Killbill.',
+                'type' => 'varchar',
+                'length' => 255,
+                'not null' => TRUE,
+                'default' => '',
+            ),
+            'event_type' => array(
+                'description' => 'The subscription event type in Killbill.',
+                'type' => 'varchar',
+                'length' => 255,
+                'not null' => TRUE,
+                'default' => '',
+            ),
+            'user_type' => array(
+                'description' => 'The subscription event user type in Killbill.',
+                'type' => 'varchar',
+                'length' => 255,
+                'not null' => TRUE,
+                'default' => '',
+            ),
+            'requested_date' => array(
+                'description' => 'The Unix timestamp when the subscription event was requested in Killbill.',
+                'type' => 'int',
+                'not null' => TRUE,
+                'default' => 0,
+            ),
+            'effective_date' => array(
+                'description' => 'The Unix timestamp when the subscription event was effective in Killbill.',
+                'type' => 'int',
+                'not null' => TRUE,
+                'default' => 0,
+            ),
+            'subscription_id' => array(
+                'description' => 'The associated subscription id in Killbill.',
+                'type' => 'varchar',
+                'length' => 255,
+                'not null' => TRUE,
+                'default' => '',
+            ),
+            'plan_name' => array(
+                'description' => 'The associated plan name in Killbill.',
+                'type' => 'varchar',
+                'length' => 255,
+                'not null' => FALSE,
+                'default' => '',
+            ),
+            'phase_name' => array(
+                'description' => 'The associated phase name in Killbill.',
+                'type' => 'varchar',
+                'length' => 255,
+                'not null' => FALSE,
+                'default' => '',
+            ),
+            'price_list_name' => array(
+                'description' => 'The associated price list name in Killbill.',
+                'type' => 'varchar',
+                'length' => 255,
+                'not null' => FALSE,
+                'default' => '',
+            ),
+            'user_token' => array(
+                'description' => 'The associated user token in Killbill.',
+                'type' => 'varchar',
+                'length' => 255,
+                'not null' => FALSE,
+                'default' => '',
+            ),
+            'current_version' => array(
+                'description' => 'The event current version in Killbill.',
+                'type' => 'varchar',
+                'length' => 255,
+                'not null' => FALSE,
+                'default' => '',
+            ),
+            'is_active' => array(
+                'description' => 'Whether the event is active in Killbill.',
+                'type' => 'varchar',
+                'length' => 255,
+                'not null' => FALSE,
+                'default' => '',
+            ),
+            'created_date' => array(
+                'description' => 'The Unix timestamp when the subscription event information was created.',
+                'type' => 'int',
+                'not null' => TRUE,
+                'default' => 0,
+            ),
+            'updated_date' => array(
+                'description' => 'The Unix timestamp when the subscription event information was last updated.',
+                'type' => 'int',
+                'not null' => TRUE,
+                'default' => 0,
+            ),
+            'data' => array(
+                'type' => 'blob',
+                'not null' => FALSE,
+                'size' => 'big',
+                'serialize' => TRUE,
+                'description' => 'A serialized array of additional data.',
+            ),
+        ),
+        'primary key' => array('kbid'),
+        'foreign keys' => array(
+            'subscription' => array(
+                'table' => 'killbill_subscriptions',
+                'columns' => array('subscription_id' => 'kbid'),
+            ),
+        ),
+    );
+
+    return $schema;
+}
+
+function killbill_install() {
+    // Initialize the Killbill listener key variable.
+    variable_set('killbill_listener_key', substr(drupal_hash_base64(REQUEST_TIME), 0, 8));
+}
+
+function killbill_uninstall() {
+    // Remove the push notification settings.
+    variable_del('killbill_listener_key');
+}

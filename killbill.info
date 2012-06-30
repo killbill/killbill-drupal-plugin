@@ -1,0 +1,4 @@
+name = Killbill
+description = Provides API integration with <a href="http://killbilling.org">Killbill</a> using its official PHP client library.
+core = 7.x
+configure = admin/config/killbill
