@@ -3,6 +3,18 @@ killbill-drupal-plugin
 
 Drupal module for Killbill. Tested on Drupal 7 only.
 
+Overview
+--------
+
+This module integrates your Drupal installation with Killbill. Among features:
+
+* Newly created Drupal accounts will be automatically created in Killbill and linked via the Drupal user id
+* Killbill account information is displayed in the standard Drupal *People* tab, there is no need to use a separate UI
+* The Catalog can be browsed in the Drupal admin section
+
+The plugin can also be configured to listen to Killbill push notifications and mirror in real-time your data from Killbill into
+your Drupal database. This makes it easy to write your own plugins that can access Killbill data locally.
+
 Getting started
 ---------------
 
