@@ -1,0 +1,124 @@
+<?php
+
+function killbill_menu() {
+    $items = array();
+
+    // Listener API for Killbill push notifications
+    $items['killbill/listener/%'] = array(
+        'page callback' => 'killbill_process_push_notification',
+        'page arguments' => array(2),
+        'access callback' => TRUE,
+        'type' => MENU_CALLBACK,
+    );
+    $items['killbill/listener/%/%'] = array(
+        'page callback' => 'killbill_process_push_notification',
+        'page arguments' => array(2, 3),
+        'access callback' => TRUE,
+        'type' => MENU_CALLBACK,
+    );
+
+    // Define administrative menu items
+    $items['admin/config/services/killbill'] = array(
+        'title' => 'Killbill',
+        'description' => 'Configure your Killbill API settings and points of integration with Drupal.',
+        'page callback' => 'drupal_get_form',
+        'page arguments' => array('killbill_settings_form'),
+        'access arguments' => array('administer killbill'),
+        'file' => 'includes/killbill.admin.inc',
+    );
+    $items['admin/config/services/killbill/settings'] = array(
+        'title' => 'Settings',
+        'description' => 'Configure your Killbill API settings and points of integration with Drupal.',
+        'type' => MENU_DEFAULT_LOCAL_TASK,
+        'weight' => -10,
+    );
+    $items['admin/config/services/killbill/catalog'] = array(
+        'title' => 'Catalog',
+        'description' => 'View your Catalog.',
+        'page callback' => 'killbill_catalog',
+        'access arguments' => array('administer killbill'),
+        'type' => MENU_LOCAL_TASK,
+        'weight' => -5,
+        'file' => 'includes/killbill.admin.inc',
+    );
+
+    return $items;
+}
+
+function killbill_permission() {
+    $permissions = array(
+        'administer killbill' => array(
+            'title' => t('Administer Killbill'),
+            'description' => t('Allows users to configure site-wide Killbill settings and grants access to all integration activities.'),
+            'restrict access' => TRUE,
+        ),
+    );
+
+    return $permissions;
+}
+
+function killbill_help($path, $arg) {
+}
+
+/**
+ * Processes an incoming push notification.
+ *
+ * Killbill can be configured to send notifications, e.g. when a new account is created
+ * or when a subscription event occurs.
+ *
+ * By default, this open-source module will listen to these notifications to
+ * mirror accounts and subscriptions information in the Drupal database.
+ * Other modules can react to incoming push notifications by implementing
+ * hook_killbill_process_push_notification(). This can be useful to extend this module
+ * and implement business logic reactions specific to your app.
+ */
+function killbill_process_push_notification($key) {
+    $notification = NULL;
+
+    // Ensure the push notification was sent to the proper URL
+    if ($key != variable_get('killbill_listener_key', '')) {
+        // Log the failed attempt and bail.
+        watchdog('killbill', 'Incoming push notification did not contain the proper URL key.', array(), WATCHDOG_WARNING);
+        return;
+    }
+
+    if (!killbill_client_initialize()) {
+        return;
+    }
+
+    // TODO - this will probably be json
+    $notification = "TODO";
+
+    // Bail if this is an empty or invalid notification
+    if (empty($notification)) {
+        return;
+    }
+
+    // Log the incoming push notification if enabled
+    if (variable_get('killbill_push_logging', FALSE)) {
+        watchdog('killbill', 'Incoming push notification: !notification', array('!notification' => '<pre>' . check_plain(print_r($notification, TRUE)) . '</pre>'), WATCHDOG_NOTICE);
+    }
+
+    module_invoke_all('killbill_process_push_notification', $notification);
+}
+
+function killbill_client_initialize($settings = NULL) {
+    // If no settings array was given, use the default account settings.
+    if (empty($settings)) {
+        $settings = array(
+            'serverUrl' => variable_get('killbill_server_url', 'http://127.0.0.1:8080'),
+        );
+    }
+
+    if (($path = libraries_get_path('killbill')) && file_exists($path . '/lib/killbill.php')) {
+        require_once $path . '/lib/killbill.php';
+        Killbill_Client::$serverUrl = $settings['serverUrl'];
+
+        watchdog('killbill', 'Successfully registered the Killbill PHP library.', array(), WATCHDOG_INFO);
+        return TRUE;
+    }
+    else {
+        watchdog('killbill', 'Could not find the Killbill PHP client library in sites/all/libraries/killbill.', array(), WATCHDOG_ERROR);
+        return FALSE;
+    }
+}
