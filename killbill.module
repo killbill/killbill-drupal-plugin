@@ -152,8 +152,9 @@ function killbill_user_insert(&$edit, $account, $category) {
     $accountData->country = null;
     $accountData->phone = null;
     $accountData->length = strlen($accountData->name);
-    $accountData->billCycleDay = 0;
-    $accountData->timeZone = $account->timezone;
+    if (property_exists($account, 'timezone')) {
+        $accountData->timeZone = $account->timezone;
+    }
 
     global $base_root;
     $accountData->create($base_root, "DRUPAL", "DRUPAL_HOOK_USER_INSERT::" . ip_address());
