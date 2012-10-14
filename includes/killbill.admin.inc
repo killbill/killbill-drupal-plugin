@@ -28,6 +28,18 @@ function killbill_settings_form($form, &$form_state) {
         '#description' => t("The absolute URI of the Killbill server, e.g. http://127.0.0.1:8080."),
         '#default_value' => variable_get('killbill_server_url', 'http://127.0.0.1:8080'),
     );
+    $form['account']['killbill_tenant_api_key'] = array(
+        '#type' => 'textfield',
+        '#title' => t('Tenant api key'),
+        '#description' => t("Your Killbill api key"),
+        '#default_value' => variable_get('killbill_tenant_api_key', NULL),
+    );
+    $form['account']['killbill_tenant_api_secret'] = array(
+        '#type' => 'textfield',
+        '#title' => t('Tenant api secret'),
+        '#description' => t("Your Killbill api secret"),
+        '#default_value' => variable_get('killbill_tenant_api_secret', NULL),
+    );
 
     $form['push'] = array(
         '#type' => 'fieldset',

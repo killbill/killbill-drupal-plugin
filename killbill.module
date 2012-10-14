@@ -206,12 +206,16 @@ function killbill_client_initialize($settings = NULL) {
     if (empty($settings)) {
         $settings = array(
             'serverUrl' => variable_get('killbill_server_url', 'http://127.0.0.1:8080'),
+            'apiKey' => variable_get('killbill_tenant_api_key', NULL),
+            'apiSecret' => variable_get('killbill_tenant_api_secret', NULL),
         );
     }
 
     if (($path = libraries_get_path('killbill')) && file_exists($path . '/lib/killbill.php')) {
         require_once $path . '/lib/killbill.php';
         Killbill_Client::$serverUrl = $settings['serverUrl'];
+        Killbill_Client::$apiKey = $settings['apiKey'];
+        Killbill_Client::$apiSecret = $settings['apiSecret'];
 
         watchdog('killbill', 'Successfully registered the Killbill PHP library.', array(), WATCHDOG_INFO);
         return TRUE;
